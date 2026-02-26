@@ -6,14 +6,14 @@ from database import Database
 import uuid
 import cv2
 router = APIRouter()
-face_engine = FaceEngine()
-voice_engine = VoiceEngine()
-db = Database()
 class RegisterRequest(BaseModel):
     name: str
     role: str
 @router.post("/register")
 async def register(request: RegisterRequest):
+    face_engine = FaceEngine()
+    voice_engine = VoiceEngine()
+    db = Database()
     cap = cv2.VideoCapture(0)
     face_embedding = None
     box = None

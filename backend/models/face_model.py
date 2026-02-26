@@ -5,7 +5,7 @@ class ConvBlock(nn.Module):
     # Neural network component
     def __init__(self, in_channels, out_channels, stride = 1):
         super(ConvBlock, self).__init__()
-        self.conv = nn.conv2d(in_channels, out_channels, kernel_size = 3, stride = stride, padding = 1, bias = False)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size = 3, stride = stride, padding = 1, bias = False)
         # the above line scans for patterns, edges, shapes, and curves and gives them numbers.
         self.bn = nn.BatchNorm2d(out_channels)
         # scales the numbers found by conv so they don't become too large.

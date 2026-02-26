@@ -13,7 +13,7 @@ class FaceEngine:
         self.model.eval()
         self.transform = transforms.Compose([
             transforms.ToPILImage(), # converts image of pixels RGB values as arrays into a PIL image
-            transforms.Resize(112 , 112), # resize the PIL image to standard size
+            transforms.Resize((112, 112), interpolation=transforms.InterpolationMode.BILINEAR), # resize the PIL image to standard size
             transforms.ToTensor(), # ToTensor helps take PIL image into values used for comparison
             transforms.Normalize( # normalize pixel values
                 mean = [0.5, 0.5, 0.5],
@@ -30,9 +30,9 @@ class FaceEngine:
         eye_center = ((left_eye[0] + right_eye[0])//2,
                       (right_eye[1] + left_eye[1])//2)
         rotation_matrix = cv2.getRotationMatrix2D(eye_center, angle, scale = 1.0)
-        # returns a 2x3 matrix with information on how to rotate the image for straightening
+        # returns a 2x3 matrix to rotate the image for straightening
         aligned = cv2.warpAffine(image, rotation_matrix, (image.shape[1], image.shape[0]))
-        # straightened image from line above
+        # multiplying each pixel's matrix to the 2x3 matrix to receieve a staright image
         return aligned
     def extract_embedding(self,frame):
         # detecting faces within the frame
