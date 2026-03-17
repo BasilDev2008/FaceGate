@@ -1,6 +1,8 @@
 from fastapi import FastAPI  # main framework for our API
 from fastapi.middleware.cors import CORSMiddleware  # allows frontend to talk to backend
 from routes.register import router as register_router  # import register routes
+from routes.stream import router as stream_router  # add this at the top
+app.include_router(stream_router, prefix="/api")  # add this after the register router line
 app = FastAPI(
     title = "FaceGate",
     description= "Machine Learning face and voice recognition security system",

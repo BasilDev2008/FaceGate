@@ -57,3 +57,18 @@ class FaceEngine:
         cv2.rectangle(frame, (x,y), (x+w, y+h), color, 2) # rectangle around face
         cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_COMPLEX, 0.8, color, 2) # write name above box
         return frame # return frame with box drawn on face
+    def compare(self, embedding, face_matrix, user_ids):
+        import faiss
+        import numpy as np
+        dimension = 128 # embedding size
+        index = faiss.IndexFlatIP(dimension)
+        faiss.normalize_L2(face_matrix)
+        index.add(face_matrix)
+        query = embedding.detach().numpy()
+        faiss.normalize_L2(query)
+        distances, indices = index.search(query, k = 1) # find 1 closest match
+        confidence = float(distances[0][0]) # similarity score
+        match_idx = int(indices[0][0]) # index of closest match
+        match_id = user_ids[match_idx] # user id of closest match
+        return match_id, confidence
+    
