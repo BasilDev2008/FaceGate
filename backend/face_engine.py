@@ -49,7 +49,7 @@ class FaceEngine:
             return None, None
         is_real, scores = self.liveness.is_live(face)
         if not is_real:
-            print(f"Liveness check failed - scores: " {scores})
+            print(f"Liveness check failed - scores:  {scores}")
             return None, None
         # prepare face for the model
         face_tensor = self.transform(face) # applies transformations to the image
