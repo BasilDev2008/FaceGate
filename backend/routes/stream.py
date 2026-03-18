@@ -27,25 +27,28 @@ def generate_frames():
         if not ret:
             break
         face_matrix, user_ids = get_embeddings()
-        embedding, box = face_engine.extract_embedding(frame) # detect the face in the frame
-        if embedding is not None and face_matrix is not None:
-            match_id, confidence = face_engine.compare(
-                embedding,
-                face_matrix,
-                user_ids
-            )
-            # compare current face with stored embeddings
+        faces = face_engine.extract_all_embeddings(frame)
+        for embedding, box in faces:
+            if face_matrix is not None:
+                match_id, confidence = face_engine.compare(
+                    embedding,
+                    face_matrix,
+                    user_ids
+
+                )
             if confidence>=0.85:
-                user = db.session.query(db.User).filter_by(id = match_id).first() # get user from the database
+                user = db.session.query(db.User).filter_by(id = match_id).first()
                 name = user.name if user else "Unknown"
                 color = (0,255,0)
             else:
                 name = "Unknown"
-                color = (0,0,255) 
-            frame = face_engine.draw_box(frame,box,name,color)
-            ret,buffer = cv2.imencode(".jpg", frame)
-            frame_bytes = buffer.tobytes()
-            yield (  # send frame to frontend
+                color = (0, 0, 255)
+        else:
+            name = "Unknown"
+            color = (0, 0, 255)
+        ret,buffer = cv2.imencode(".jpg", frame)
+        frame_bytes = buffer.tobytes()
+        yield (  # send frame to frontend
                 b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n'
         )

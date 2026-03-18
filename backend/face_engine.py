@@ -76,4 +76,29 @@ class FaceEngine:
         match_idx = int(indices[0][0]) # index of closest match
         match_id = user_ids[match_idx] # user id of closest match
         return match_id, confidence
+    def extract_all_embeddings(self, frame):
+        results = self.detector.detect_faces(frame) # detects all faces
+
+        if not results:
+            return []
+        faces = []
+        for result in results:
+            if result['confidence'] < 0.95:
+                continue
+            x, y, w, h = result['box']
+            x, y = max(0, w), max(0, y) # ensures x and y are positive
+            aligned_frame = self.align_face(frame, result['keypoints'])
+            face = aligned_frame[y:y+h, x: x+w] # crop face
+            if face.size == 0:
+                continue
+            is_real, scores = self.liveness.is_live(face)
+            if not is_real:
+                continue
+            face_tensor = self.transform(face) 
+            face_tensor = face_tensor.unsqueeze(0)
+            with torch.nograd():
+                embedding = self.model(face_tensor)
+            faces.append((embedding, result['box']))
+        return faces
+
     
