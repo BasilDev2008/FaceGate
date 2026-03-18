@@ -5,9 +5,10 @@ import math
 import torchvision.transforms as transforms # preparing perfect images for the model
 from mtcnn import MTCNN # detecting faces and eye coordinates
 from models.face_model import FaceEmbeddingModel # model of traning in face_model.py
-
+from liveness import LivenessDetector 
 class FaceEngine:
     def __init__(self):
+        self.liveness = LivenessDetector()
         self.detector = MTCNN() # loads face detector
         self.model = FaceEmbeddingModel() # loads our face model
         self.model.eval()
@@ -45,6 +46,10 @@ class FaceEngine:
         aligned_frame = self.align_face(frame, result['keypoints'])
         face = aligned_frame[y:y+h, x:x+w] # crops only face from y point of face to the height of ur face
         if face.size == 0: # cropped face is empty
+            return None, None
+        is_real, scores = self.liveness.is_live(face)
+        if not is_real:
+            print(f"Liveness check failed - scores: " {scores})
             return None, None
         # prepare face for the model
         face_tensor = self.transform(face) # applies transformations to the image
