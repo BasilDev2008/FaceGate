@@ -22,5 +22,5 @@ class VoiceEmbeddingModel(nn.Module):
         x = self.network(x) # voice passes through all layers
         x = self.pool(x) # squash
         x = x.view(x.size(0), -1) # flattens to a 1D grid for voices
-        x = self.fc() # voice has a unique imprint
+        x = self.fc(x) # voice has a unique imprint
         return F.normalize(x, p = 2, dim = 1) # scales so all voices are within the same range
