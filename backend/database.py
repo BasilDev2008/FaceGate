@@ -1,21 +1,22 @@
 from sqlalchemy import create_engine, Column, String, DateTime, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker  # talking to the database
+from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import numpy as np
+import os
 
 Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'users'  # name of the table
+    __tablename__ = 'users'
 
-    id = Column(String, primary_key=True)  # creates unique ID for each user
-    name = Column(String, nullable=False)  # full name of user
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
     role = Column(String, nullable=False)
     face_embedding = Column(LargeBinary, nullable=False)
     voice_embedding = Column(LargeBinary, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)  # time of registry
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class AttendanceRecord(Base):
@@ -25,14 +26,19 @@ class AttendanceRecord(Base):
     user_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow)
-    status = Column(String, nullable=False)  # late or present
+    status = Column(String, nullable=False)
     confidence_face = Column(String, nullable=False)
     confidence_voice = Column(String, nullable=False)
 
 
 class Database:
     def __init__(self):
-        self.engine = create_engine('sqlite:///facegate.db')  # create database file
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(base_dir, "facegate.db")
+
+        print("ACTUAL DB PATH:", db_path)
+
+        self.engine = create_engine(f"sqlite:///{db_path}")
         Base.metadata.create_all(self.engine)
         Session = sessionmaker(bind=self.engine)
         self.session = Session()

@@ -22,7 +22,7 @@ def augment_faces(person_name):
         #second augmentation rotate left
         h, w = img.shape[:2] # dimensions of image
         matrix = cv2.getRotationMatrix2D((w//2, h//2), 10, 1.0) # rotate by 10 degrees
-        rotated_left = cv2.warp.Affine(img, matrix, (w,h))
+        rotated_left = cv2.warpAffine(img, matrix, (w, h))
         cv2.imwrite(f"{output_folder}/{count}.jpg", rotated_left)
         count+=1
         # [[cos(10°),  sin(10°),  tx],
